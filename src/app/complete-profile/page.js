@@ -3,9 +3,11 @@
 import React, { useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import { useFaculty } from "@/context/facultyContext";
 
 export default function FacultyForm() {
   const { getToken, userId } = useAuth();
+  const { BackendURL } = useFaculty();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -39,7 +41,7 @@ export default function FacultyForm() {
     try {
       const token = await getToken({ template: "default" });
 
-      const res = await fetch("http://localhost:3014/api/register", {
+      const res = await fetch(`${BackendURL}/api/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -62,9 +64,11 @@ export default function FacultyForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+    <div
+      className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
       style={{
-        background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%)"
+        background:
+          "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%)",
       }}
     >
       {/* Decorative background elements */}
@@ -76,7 +80,7 @@ export default function FacultyForm() {
       {/* Form container */}
       <div className="relative w-full max-w-md">
         <div className="absolute inset-0 bg-linear-to-r from-blue-100/40 to-cyan-100/40 rounded-2xl blur-xl -z-10"></div>
-        
+
         <form
           onSubmit={handleSubmit}
           className="relative bg-white p-8 rounded-2xl border border-slate-200/60 shadow-xl"
@@ -84,20 +88,34 @@ export default function FacultyForm() {
           {/* Header */}
           <div className="mb-8 text-center">
             <div className="inline-block mb-4 p-3 bg-linear-to-br from-blue-600 to-cyan-600 rounded-lg">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                className="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             </div>
             <h1 className="text-3xl font-bold text-slate-900 mb-2">
               Faculty Profile
             </h1>
-            <p className="text-slate-500 text-sm tracking-wide">Complete your professional information</p>
+            <p className="text-slate-500 text-sm tracking-wide">
+              Complete your professional information
+            </p>
           </div>
 
           {/* Success message */}
           {submitted && (
             <div className="mb-6 p-4 bg-linear-to-r from-green-50 to-emerald-50 border border-green-200/60 rounded-lg animate-in fade-in duration-300">
-              <p className="text-green-700 text-sm font-medium">✓ Profile saved successfully!</p>
+              <p className="text-green-700 text-sm font-medium">
+                ✓ Profile saved successfully!
+              </p>
             </div>
           )}
 
@@ -105,7 +123,9 @@ export default function FacultyForm() {
           <div className="space-y-5">
             {/* Name */}
             <div className="group">
-              <label className="block text-sm font-semibold text-slate-700 mb-2 tracking-wide">Full Name</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2 tracking-wide">
+                Full Name
+              </label>
               <input
                 type="text"
                 name="name"
@@ -118,12 +138,18 @@ export default function FacultyForm() {
                     : "border-slate-300/60 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                 }`}
               />
-              {errors.name && <p className="text-red-600 text-xs mt-1.5 font-medium">{errors.name}</p>}
+              {errors.name && (
+                <p className="text-red-600 text-xs mt-1.5 font-medium">
+                  {errors.name}
+                </p>
+              )}
             </div>
 
             {/* Email */}
             <div className="group">
-              <label className="block text-sm font-semibold text-slate-700 mb-2 tracking-wide">Email Address</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2 tracking-wide">
+                Email Address
+              </label>
               <input
                 type="email"
                 name="email"
@@ -136,12 +162,18 @@ export default function FacultyForm() {
                     : "border-slate-300/60 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                 }`}
               />
-              {errors.email && <p className="text-red-600 text-xs mt-1.5 font-medium">{errors.email}</p>}
+              {errors.email && (
+                <p className="text-red-600 text-xs mt-1.5 font-medium">
+                  {errors.email}
+                </p>
+              )}
             </div>
 
             {/* Phone */}
             <div className="group">
-              <label className="block text-sm font-semibold text-slate-700 mb-2 tracking-wide">Phone Number</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2 tracking-wide">
+                Phone Number
+              </label>
               <input
                 type="tel"
                 name="phoneNumber"
@@ -154,12 +186,18 @@ export default function FacultyForm() {
                     : "border-slate-300/60 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                 }`}
               />
-              {errors.phoneNumber && <p className="text-red-600 text-xs mt-1.5 font-medium">{errors.phoneNumber}</p>}
+              {errors.phoneNumber && (
+                <p className="text-red-600 text-xs mt-1.5 font-medium">
+                  {errors.phoneNumber}
+                </p>
+              )}
             </div>
 
             {/* Department */}
             <div className="group relative">
-              <label className="block text-sm font-semibold text-slate-700 mb-2 tracking-wide">Department</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2 tracking-wide">
+                Department
+              </label>
               <select
                 name="department"
                 value={form.department}
@@ -175,10 +213,24 @@ export default function FacultyForm() {
                 <option value="Accounting">Accounting</option>
                 <option value="Multimedia">Multimedia</option>
               </select>
-              <svg className="absolute right-3 top-10 w-5 h-5 text-slate-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+              <svg
+                className="absolute right-3 top-10 w-5 h-5 text-slate-500 pointer-events-none"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                />
               </svg>
-              {errors.department && <p className="text-red-600 text-xs mt-1.5 font-medium">{errors.department}</p>}
+              {errors.department && (
+                <p className="text-red-600 text-xs mt-1.5 font-medium">
+                  {errors.department}
+                </p>
+              )}
             </div>
           </div>
 
@@ -193,7 +245,11 @@ export default function FacultyForm() {
             }`}
           >
             <span className="relative z-10">
-              {loading ? "Saving Profile..." : submitted ? "Profile Saved" : "Save Profile"}
+              {loading
+                ? "Saving Profile..."
+                : submitted
+                  ? "Profile Saved"
+                  : "Save Profile"}
             </span>
             {!loading && !submitted && (
               <div className="absolute inset-0 bg-linear-to-r from-blue-400 to-cyan-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>

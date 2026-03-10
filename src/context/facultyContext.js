@@ -3,6 +3,7 @@
 import React, { useState, useContext, useEffect, createContext } from "react";
 import { useUser, useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import Loading from "@/components/Loading";
 
 const FacultyContext = createContext();
 
@@ -10,7 +11,7 @@ export const FacultyProvider = ({ children }) => {
   const { isLoaded, isSignedIn } = useUser();
   const { getToken } = useAuth();
   const router = useRouter();
-
+  const BackendURL = process.env.NEXT_PUBLIC_BACKEND_URL;
   const [faculty, setFaculty] = useState(null);
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -58,7 +59,7 @@ export const FacultyProvider = ({ children }) => {
     try {
       const token = await getToken({ template: "default" });
 
-      const res = await fetch("http://localhost:3014/api/get-all-students", {
+      const res = await fetch(`${BackendURL}/api/get-all-students`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -68,7 +69,6 @@ export const FacultyProvider = ({ children }) => {
       const data = await res.json();
 
       if (data.success) {
-        console.log(data);
         
         setStudents(data.students);  // ✅ store in state
       }
@@ -85,6 +85,8 @@ export const FacultyProvider = ({ children }) => {
         fetchAllStudents,
         loading,
         isSignedIn,
+        setLoading,
+        BackendURL
       }}
     >
       {children}

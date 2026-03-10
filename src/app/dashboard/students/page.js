@@ -21,36 +21,87 @@ import { useAuth } from "@clerk/nextjs";
 import { useFaculty } from "@/context/facultyContext";
 import StatusBadge from "@/components/StatusBadge";
 import StatCard from "@/components/StatCard";
+import { courseOptions } from "@/data";
+import Link from "next/link";
+import Loading from "@/components/Loading";
 
 export default function StudentsDashboard() {
-  const { students, fetchAllStudents } = useFaculty();
+  const { students, fetchAllStudents,BackendURL } = useFaculty();
   const router = useRouter();
   const { isSignedIn, getToken } = useAuth();
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [courseFilter, setCourseFilter] = useState("");
+  const [batchFilter, setBatchFilter] = useState("");
+  const [daysFilter, setDaysFilter] = useState("");
   const [openMenu, setOpenMenu] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+  const loadStudents = async () => {
     if (isSignedIn) {
-      fetchAllStudents();
+      setLoading(true);
+      await fetchAllStudents();
+      setLoading(false);
     }
-  }, [isSignedIn, fetchAllStudents]);
+  };
+
+  loadStudents();
+}, [isSignedIn]);
+
+  if (loading) {
+  return (
+    <div className="flex items-center justify-center h-[70vh]">
+      <div className="flex flex-col items-center gap-3">
+        <Loading />
+      </div>
+    </div>
+  );
+}
 
   /* ------------------------------
    Optimized Search
 --------------------------------*/
+
+  const normalizedStudents = useMemo(() => {
+    return students.map((s) => ({
+      ...s,
+      nameLower: s.name?.toLowerCase() || "",
+      courseLower: s.course?.toLowerCase() || "",
+      rollnoStr: s.rollno?.toString() || "",
+    }));
+  }, [students]);
+
   const filteredStudents = useMemo(() => {
-    const search = searchTerm.toLowerCase();
+    const search = searchTerm.trim().toLowerCase();
 
-    return students.filter((s) => {
-      return (
-        s.name?.toLowerCase().includes(search) ||
-        s.rollno?.toLowerCase().includes(search) ||
-        s.course?.toLowerCase().includes(search)
-      );
+    return normalizedStudents.filter((s) => {
+      if (
+        search &&
+        !(
+          s.nameLower.includes(search) ||
+          s.rollnoStr.includes(search) ||
+          s.courseLower.includes(search)
+        )
+      ) {
+        return false;
+      }
+
+      if (courseFilter && s.courseLower !== courseFilter.toLowerCase()) {
+        return false;
+      }
+
+      if (batchFilter && s.batch !== batchFilter) {
+        return false;
+      }
+
+      if (daysFilter && s.days !== daysFilter) {
+        return false;
+      }
+
+      return true;
     });
-  }, [students, searchTerm]);
-
+  }, [normalizedStudents, searchTerm, courseFilter, batchFilter, daysFilter]);
   /* ------------------------------
    Optimized Stats (Single Loop)
 --------------------------------*/
@@ -94,7 +145,7 @@ export default function StudentsDashboard() {
     try {
       const token = await getToken({ template: "default" });
 
-      const res = await fetch("http://localhost:3014/api/delete-student", {
+      const res = await fetch(`${BackendURL}/api/delete-student`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -186,8 +237,9 @@ export default function StudentsDashboard() {
           </div>
 
           {/* ===== SEARCH + FILTER ===== */}
-          <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-4 flex flex-col sm:flex-row gap-3 sm:items-center justify-between mb-8">
-            <div className="relative w-full sm:flex-1 sm:max-w-sm">
+          <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-4 flex flex-col lg:flex-row gap-3 lg:items-center justify-between mb-8">
+            {/* SEARCH */}
+            <div className="relative w-full lg:max-w-sm">
               <Search
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
                 size={18}
@@ -201,9 +253,52 @@ export default function StudentsDashboard() {
               />
             </div>
 
-            <button className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium bg-white hover:bg-slate-50 border border-slate-300 rounded-lg transition duration-200 text-slate-700 w-full sm:w-auto shadow-sm">
-              <Filter size={18} /> Filter
-            </button>
+            {/* FILTERS */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full lg:w-auto">
+              {/* Course Filter */}
+              <select
+                value={courseFilter}
+                onChange={(e) => setCourseFilter(e.target.value)}
+                className="w-full px-3 py-3 text-sm border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+              >
+                <option value="">All Courses</option>
+
+                {courseOptions.map((course) => (
+                  <option key={course.value} value={course.value}>
+                    {course.label}
+                  </option>
+                ))}
+              </select>
+
+              {/* Batch Timing */}
+              <select
+                value={batchFilter}
+                onChange={(e) => setBatchFilter(e.target.value)}
+                className="w-full px-3 py-3 text-sm border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+              >
+                <option value="">All Timings</option>
+                <option value="7:30-9:00">7:30 - 9:00</option>
+                <option value="9:00-10:30">9:00 - 10:30</option>
+                <option value="10:30-12:00">10:30 - 12:00</option>
+                <option value="12:00-1:30">12:00 - 1:30</option>
+                <option value="2:00-3:30">2:00 - 3:30</option>
+                <option value="3:30-5:00">3:30 - 5:00</option>
+                <option value="5:00-6:30">5:00 - 6:30</option>
+              </select>
+
+              {/* Class Days */}
+              <select
+                value={daysFilter}
+                onChange={(e) => setDaysFilter(e.target.value)}
+                className="w-full px-3 py-3 text-sm border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+              >
+                <option value="">All Days</option>
+                <option value="MWF">MWF</option>
+                <option value="TTS">TTS</option>
+                <option value="Daily">Daily</option>
+                <option value="Weekend">Weekend</option>
+              </select>
+            </div>
           </div>
 
           {/* ===== DESKTOP TABLE ===== */}
@@ -239,9 +334,12 @@ export default function StudentsDashboard() {
                       >
                         <td className="px-6 py-4">
                           <div>
-                            <p className="font-semibold text-slate-900 group-hover:text-blue-600 transition">
+                            <Link
+                              href={`/dashboard/students/${s._id}`}
+                              className="font-semibold text-slate-900 group-hover:text-blue-600 transition"
+                            >
                               {s.name}
-                            </p>
+                            </Link>
                             <p className="text-xs text-slate-500 mt-1">
                               {s.rollno}
                             </p>
@@ -257,7 +355,13 @@ export default function StudentsDashboard() {
                         </td>
 
                         <td className="px-6 py-4">
-                          <StatusBadge status={s.status} />
+                          <StatusBadge
+                            id={s._id}
+                            status={s.status}
+                            onClick={() => {
+                              console.log("data");
+                            }}
+                          />
                         </td>
 
                         <td className="px-6 py-4 text-center">
@@ -279,8 +383,11 @@ export default function StudentsDashboard() {
                                 <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 transition">
                                   <Edit size={16} /> Edit
                                 </button>
-                                <button onClick={()=>handleDeleteStudent(s._id)} className="w-full flex items-center gap-2 px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 transition">
-                                  <Trash2  size={16} /> Delete
+                                <button
+                                  onClick={() => handleDeleteStudent(s._id)}
+                                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 transition"
+                                >
+                                  <Trash2 size={16} /> Delete
                                 </button>
                               </div>
                             )}
@@ -313,12 +420,15 @@ export default function StudentsDashboard() {
                 >
                   <div className="flex justify-between items-start gap-3">
                     <div>
-                      <p className="font-semibold text-slate-900 group-hover:text-blue-600 transition">
+                      <Link
+                        href={`/dashboard/students/${s._id}`}
+                        className="font-semibold text-slate-900 group-hover:text-blue-600 transition"
+                      >
                         {s.name}
-                      </p>
+                      </Link>
                       <p className="text-xs text-slate-500 mt-1">{s.email}</p>
                     </div>
-                    <StatusBadge status={s.status} />
+                    <StatusBadge status={s.status} id={s._id} />
                   </div>
 
                   <div className="space-y-3 border-t border-slate-200 pt-4">
@@ -365,12 +475,15 @@ export default function StudentsDashboard() {
                 >
                   <div className="flex justify-between items-start gap-2">
                     <div>
-                      <p className="font-semibold text-slate-900 text-sm">
+                      <Link
+                        href={`/dashboard/students/${s._id}`}
+                        className="font-semibold text-slate-900 text-sm"
+                      >
                         {s.name}
-                      </p>
+                      </Link>
                       <p className="text-xs text-slate-500 mt-1">{s.email}</p>
                     </div>
-                    <StatusBadge status={s.status} />
+                    <StatusBadge status={s.status} id={s._id} />
                   </div>
 
                   <div className="grid grid-cols-2 gap-3 text-xs border-t border-slate-200 pt-3">
