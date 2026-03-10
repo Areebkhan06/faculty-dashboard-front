@@ -116,7 +116,7 @@ export default function AddStudentsPage() {
           days: "",
         });
       } else {
-        alert(data.message || "Something went wrong!");
+        alert(data.message);
       }
     } catch (error) {
       console.error("Network error:", error);
