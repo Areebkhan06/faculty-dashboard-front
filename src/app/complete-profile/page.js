@@ -25,6 +25,9 @@ export default function FacultyForm() {
     setErrors({ ...errors, [e.target.name]: "" });
   };
 
+  console.log(BackendURL);
+  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -32,16 +35,18 @@ export default function FacultyForm() {
     Object.keys(form).forEach((key) => {
       if (!form[key]) newErrors[key] = "This field is required";
     });
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
 
     setLoading(true);
+
     try {
       const token = await getToken({ template: "default" });
 
-      const res = await fetch(`${BackendURL}/api/register`, {
+      const res = await fetch(`http://localhost:3014/api/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -50,16 +55,25 @@ export default function FacultyForm() {
         body: JSON.stringify(form),
       });
 
+      // Check if request failed
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("Server returned:", text);
+        throw new Error("Server error");
+      }
+
       const data = await res.json();
-      if (data.success || data.message == "Faculty already registered") {
+
+      if (data.success || data.message === "Faculty already registered") {
         router.push("/dashboard");
       } else {
         alert(data.message || "Something went wrong");
       }
     } catch (err) {
-      console.error(err);
+      console.error("Error:", err);
       alert("Network error!");
     }
+
     setLoading(false);
   };
 

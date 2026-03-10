@@ -3,7 +3,6 @@
 import React, { useState, useContext, useEffect, createContext } from "react";
 import { useUser, useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import Loading from "@/components/Loading";
 
 const FacultyContext = createContext();
 
@@ -11,17 +10,17 @@ export const FacultyProvider = ({ children }) => {
   const { isLoaded, isSignedIn } = useUser();
   const { getToken } = useAuth();
   const router = useRouter();
+
   const BackendURL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
   const [faculty, setFaculty] = useState(null);
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Check Faculty Profile
+  // 🔐 Check faculty profile after login
   useEffect(() => {
     const checkFacultyProfile = async () => {
-      if (!isLoaded) return;
-
-      if (!isSignedIn) {
+      if (!isLoaded || !isSignedIn) {
         setLoading(false);
         return;
       }
@@ -45,7 +44,7 @@ export const FacultyProvider = ({ children }) => {
           router.replace("/complete-profile");
         }
       } catch (error) {
-        console.error("Profile check error:", error);
+        console.error(error);
       } finally {
         setLoading(false);
       }
@@ -54,24 +53,12 @@ export const FacultyProvider = ({ children }) => {
     checkFacultyProfile();
   }, [isLoaded, isSignedIn]);
 
-  if (!faculty) {
-  return res.json({
-    success: false,
-    message: "Faculty profile not found",
-  });
-}
-
-  // ✅ Fetch All Students
+  // 📚 Fetch students
   const fetchAllStudents = async () => {
-
-    if(!faculty){
-      router.replace("/complete-profile");
-    }
     try {
       const token = await getToken({ template: "default" });
 
       const res = await fetch(`${BackendURL}/api/get-all-students`, {
-        method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -80,10 +67,10 @@ export const FacultyProvider = ({ children }) => {
       const data = await res.json();
 
       if (data.success) {
-        setStudents(data.students); // ✅ store in state
+        setStudents(data.students);
       }
     } catch (error) {
-      console.error("Error fetching students:", error);
+      console.error(error);
     }
   };
 
@@ -95,9 +82,7 @@ export const FacultyProvider = ({ children }) => {
         fetchAllStudents,
         loading,
         isSignedIn,
-        setLoading,
-        BackendURL,
-        checkFacultyProfile,
+        BackendURL
       }}
     >
       {children}

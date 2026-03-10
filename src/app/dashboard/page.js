@@ -21,11 +21,17 @@ import {
   IndianRupee,
   MapPin,
 } from "lucide-react";
+import { useFaculty } from "@/context/facultyContext";
+import { useRouter } from "next/navigation";
 
 const EnhancedStudentDashboard = () => {
+  const {faculty} = useFaculty();
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [activeTab, setActiveTab] = useState("students");
+
+
 
   // Students Data
   const studentsData = [
