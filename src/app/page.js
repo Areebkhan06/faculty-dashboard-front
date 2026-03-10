@@ -15,9 +15,11 @@ import { useState } from "react";
 import FeatureCard from "@/components/FeatureCard";
 import TrustCard from "@/components/TrustCard";
 import MetricCard from "@/components/MetricCard";
+import { useFaculty } from "@/context/facultyContext";
 
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const {checkFacultyProfile} = useFaculty()
 
   return (
     <div className="selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden bg-white">

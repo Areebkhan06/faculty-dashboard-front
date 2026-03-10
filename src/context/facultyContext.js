@@ -29,7 +29,7 @@ export const FacultyProvider = ({ children }) => {
       try {
         const token = await getToken({ template: "default" });
 
-        const res = await fetch("http://localhost:3014/api/profile-check", {
+        const res = await fetch(`${BackendURL}/api/profile-check`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -39,10 +39,10 @@ export const FacultyProvider = ({ children }) => {
 
         const data = await res.json();
 
-        if (data.success) {
+        if (data.success && data.faculty) {
           setFaculty(data.faculty);
         } else {
-          router.push("/complete-profile");
+          router.replace("/complete-profile");
         }
       } catch (error) {
         console.error("Profile check error:", error);
@@ -52,10 +52,21 @@ export const FacultyProvider = ({ children }) => {
     };
 
     checkFacultyProfile();
-  }, [isLoaded, isSignedIn, getToken, router]);
+  }, [isLoaded, isSignedIn]);
+
+  if (!faculty) {
+  return res.json({
+    success: false,
+    message: "Faculty profile not found",
+  });
+}
 
   // ✅ Fetch All Students
   const fetchAllStudents = async () => {
+
+    if(!faculty){
+      router.replace("/complete-profile");
+    }
     try {
       const token = await getToken({ template: "default" });
 
@@ -69,8 +80,7 @@ export const FacultyProvider = ({ children }) => {
       const data = await res.json();
 
       if (data.success) {
-        
-        setStudents(data.students);  // ✅ store in state
+        setStudents(data.students); // ✅ store in state
       }
     } catch (error) {
       console.error("Error fetching students:", error);
@@ -86,7 +96,8 @@ export const FacultyProvider = ({ children }) => {
         loading,
         isSignedIn,
         setLoading,
-        BackendURL
+        BackendURL,
+        checkFacultyProfile,
       }}
     >
       {children}
