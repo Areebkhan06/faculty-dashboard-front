@@ -25,7 +25,6 @@ export default function FacultyForm() {
     setErrors({ ...errors, [e.target.name]: "" });
   };
 
-  console.log(BackendURL);
   
 
   const handleSubmit = async (e) => {
@@ -46,7 +45,7 @@ export default function FacultyForm() {
     try {
       const token = await getToken({ template: "default" });
 
-      const res = await fetch(`http://localhost:3014/api/register`, {
+      const res = await fetch(`${BackendURL}/api/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
