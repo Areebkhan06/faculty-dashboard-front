@@ -225,6 +225,7 @@ export default function FacultyForm() {
                 <option value="Software">Software</option>
                 <option value="Accounting">Accounting</option>
                 <option value="Multimedia">Multimedia</option>
+                <option value="DM">DM</option>
               </select>
               <svg
                 className="absolute right-3 top-10 w-5 h-5 text-slate-500 pointer-events-none"
