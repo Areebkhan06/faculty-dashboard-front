@@ -23,9 +23,11 @@ import {
   Menu,
   ArrowRight,
 } from "lucide-react";
+import { useFaculty } from "@/context/facultyContext";
 
 const FeeManagement = () => {
   const { getToken } = useAuth();
+  const {BackendURL} = useFaculty();
 
   const [fees, setFees] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -103,7 +105,7 @@ const FeeManagement = () => {
 
       const token = await getToken({ template: "default" });
 
-      const res = await fetch("http://localhost:3014/api/get-fees", {
+      const res = await fetch(`${BackendURL}/api/get-fees`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -186,7 +188,7 @@ const FeeManagement = () => {
 
       const token = await getToken({ template: "default" });
 
-      const res = await fetch("http://localhost:3014/api/mark-fee-paid", {
+      const res = await fetch(`${BackendURL}/api/mark-fee-paid`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
