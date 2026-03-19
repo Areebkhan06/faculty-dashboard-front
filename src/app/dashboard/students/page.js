@@ -26,7 +26,7 @@ import Link from "next/link";
 import Loading from "@/components/Loading";
 
 export default function StudentsDashboard() {
-  const { students, fetchAllStudents,BackendURL } = useFaculty();
+  const { students, fetchAllStudents, BackendURL,setStudents } = useFaculty();
   const router = useRouter();
   const { isSignedIn, getToken } = useAuth();
 
@@ -38,26 +38,26 @@ export default function StudentsDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-  const loadStudents = async () => {
-    if (isSignedIn) {
-      setLoading(true);
-      await fetchAllStudents();
-      setLoading(false);
-    }
-  };
+    const loadStudents = async () => {
+      if (isSignedIn) {
+        setLoading(true);
+        await fetchAllStudents();
+        setLoading(false);
+      }
+    };
 
-  loadStudents();
-}, [isSignedIn]);
+    loadStudents();
+  }, [isSignedIn]);
 
   if (loading) {
-  return (
-    <div className="flex items-center justify-center h-[70vh]">
-      <div className="flex flex-col items-center gap-3">
-        <Loading />
+    return (
+      <div className="flex items-center justify-center h-[70vh]">
+        <div className="flex flex-col items-center gap-3">
+          <Loading />
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   /* ------------------------------
    Optimized Search
@@ -166,6 +166,34 @@ export default function StudentsDashboard() {
     }
   };
 
+  const handleDeleteAllStudents = async () => {
+    try {
+      const confirmDelete = confirm(
+        "Are you sure you want to delete ALL students?",
+      );
+      if (!confirmDelete) return;
+
+      const token = await getToken({ template: "default" });
+
+      const res = await fetch(`${BackendURL}/api/delete-all-students`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setStudents([]); // 🔥 instant UI update
+      } else {
+        console.log(data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50">
       {/* Decorative background elements */}
@@ -190,6 +218,9 @@ export default function StudentsDashboard() {
             <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
               <button className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium bg-white hover:bg-slate-50 border border-slate-300 rounded-lg transition duration-200 text-slate-700 w-full sm:w-auto shadow-sm">
                 <Download size={18} /> Export
+              </button>
+              <button onClick={handleDeleteAllStudents} className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium bg-white hover:bg-slate-50 border border-slate-300 rounded-lg transition duration-200 text-slate-700 w-full sm:w-auto shadow-sm">
+                <Trash2 size={18} /> Delete All
               </button>
               <button
                 onClick={() => router.push("/dashboard/students/add-students")}
@@ -503,7 +534,10 @@ export default function StudentsDashboard() {
                     {/* <button className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-xs text-slate-700 bg-slate-50 hover:bg-slate-100 rounded transition font-medium">
                       <Eye size={14} /> View
                     </button> */}
-                    <button onClick={()=>handleDeleteStudent(s._id)} className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-xs text-slate-700 bg-slate-50 hover:bg-slate-100 rounded transition font-medium">
+                    <button
+                      onClick={() => handleDeleteStudent(s._id)}
+                      className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-xs text-slate-700 bg-slate-50 hover:bg-slate-100 rounded transition font-medium"
+                    >
                       <Trash2 size={14} /> Delete
                     </button>
                   </div>

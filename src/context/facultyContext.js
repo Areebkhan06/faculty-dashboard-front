@@ -82,6 +82,7 @@ export const FacultyProvider = ({ children }) => {
         fetchAllStudents,
         loading,
         isSignedIn,
+        setStudents,
         BackendURL
       }}
     >
