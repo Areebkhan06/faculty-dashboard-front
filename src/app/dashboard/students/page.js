@@ -26,7 +26,7 @@ import Link from "next/link";
 import Loading from "@/components/Loading";
 
 export default function StudentsDashboard() {
-  const { students, fetchAllStudents, BackendURL,setStudents } = useFaculty();
+  const { students, fetchAllStudents, BackendURL, setStudents } = useFaculty();
   const router = useRouter();
   const { isSignedIn, getToken } = useAuth();
 
@@ -36,6 +36,7 @@ export default function StudentsDashboard() {
   const [daysFilter, setDaysFilter] = useState("");
   const [openMenu, setOpenMenu] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     const loadStudents = async () => {
@@ -167,17 +168,21 @@ export default function StudentsDashboard() {
   };
 
   const handleDeleteAllStudents = async () => {
-    try {
-      const confirmDelete = confirm(
-        "Are you sure you want to delete ALL students?",
-      );
-      if (!confirmDelete) return;
+    const confirmDelete = confirm(
+      "Are you sure you want to delete ALL students?",
+    );
 
+    if (!confirmDelete) return;
+
+    setDeleting(true)
+
+    try {
       const token = await getToken({ template: "default" });
 
       const res = await fetch(`${BackendURL}/api/delete-all-students`, {
-        method: "DELETE",
+        method: "POST",
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
@@ -185,9 +190,9 @@ export default function StudentsDashboard() {
       const data = await res.json();
 
       if (data.success) {
-        setStudents([]); // 🔥 instant UI update
-      } else {
-        console.log(data.message);
+        alert("Deleted all students");
+        fetchAllStudents();
+        setDeleting(false)
       }
     } catch (error) {
       console.log(error);
@@ -219,8 +224,23 @@ export default function StudentsDashboard() {
               <button className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium bg-white hover:bg-slate-50 border border-slate-300 rounded-lg transition duration-200 text-slate-700 w-full sm:w-auto shadow-sm">
                 <Download size={18} /> Export
               </button>
-              <button onClick={handleDeleteAllStudents} className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium bg-white hover:bg-slate-50 border border-slate-300 rounded-lg transition duration-200 text-slate-700 w-full sm:w-auto shadow-sm">
-                <Trash2 size={18} /> Delete All
+              <button
+                onClick={handleDeleteAllStudents}
+                disabled={deleting}
+                className={`flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium rounded-lg transition duration-200 w-full sm:w-auto shadow-sm
+                ${
+                  deleting
+                    ? "bg-red-300 cursor-not-allowed"
+                    : "bg-red-600 hover:bg-red-700 text-white border border-red-500"
+                }`}
+                          >
+                {deleting ? (
+                  "Deleting..."
+                ) : (
+                  <>
+                    <Trash2 size={18} /> Delete All
+                  </>
+                )}
               </button>
               <button
                 onClick={() => router.push("/dashboard/students/add-students")}
