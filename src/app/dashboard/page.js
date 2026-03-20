@@ -27,7 +27,7 @@ import { useFaculty } from "@/context/facultyContext";
 import { useRouter } from "next/navigation";
 
 const EnhancedStudentDashboard = () => {
-  const { faculty } = useFaculty();
+  const { requestCount } = useFaculty();
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -340,12 +340,12 @@ const EnhancedStudentDashboard = () => {
               <span className="hidden sm:inline">Transfer Requests</span>
               <span className="sm:hidden">Requests</span>
 
-              {/* ✅ notification dot — show if there are pending requests */}
-              {/* {pendingRequestsCount > 0 && ( */}
-              <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                {/* {pendingRequestsCount > 9 ? "9+" : pendingRequestsCount} */}
-              </span>
-              {/* )} */}
+              {/* ✅ only show badge if there are pending requests */}
+              {requestCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  {requestCount > 9 ? "9+" : requestCount}
+                </span>
+              )}
             </button>
           </div>
         </div>

@@ -8,7 +8,7 @@ const monthsShort = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct"
 
 const RequestPage = () => {
   const { getToken } = useAuth();
-  const { BackendURL } = useFaculty();
+  const { BackendURL,setrequestCount } = useFaculty();
 
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -25,7 +25,10 @@ const RequestPage = () => {
         },
       });
       const data = await res.json();
-      if (data.success) setRequests(data.data);
+      if (data.success){ 
+        setrequestCount(data.data.length);
+        setRequests(data.data);
+      }
     } catch (err) {
       console.error("fetchRequests error →", err);
     } finally {

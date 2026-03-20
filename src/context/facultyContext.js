@@ -16,6 +16,7 @@ export const FacultyProvider = ({ children }) => {
   const [faculty, setFaculty] = useState(null);
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [requestCount, setrequestCount] = useState("0");
 
   // 🔐 Check faculty profile after login
   useEffect(() => {
@@ -83,7 +84,9 @@ export const FacultyProvider = ({ children }) => {
         loading,
         isSignedIn,
         setStudents,
-        BackendURL
+        BackendURL,
+        setrequestCount,
+        requestCount
       }}
     >
       {children}
