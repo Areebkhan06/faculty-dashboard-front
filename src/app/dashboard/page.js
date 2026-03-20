@@ -20,18 +20,18 @@ import {
   Briefcase,
   IndianRupee,
   MapPin,
+  PlusCircleIcon,
+  ArrowRightLeft,
 } from "lucide-react";
 import { useFaculty } from "@/context/facultyContext";
 import { useRouter } from "next/navigation";
 
 const EnhancedStudentDashboard = () => {
-  const {faculty} = useFaculty();
+  const { faculty } = useFaculty();
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [activeTab, setActiveTab] = useState("students");
-
-
 
   // Students Data
   const studentsData = [
@@ -95,7 +95,8 @@ const EnhancedStudentDashboard = () => {
       _id: "a1",
       title: "Web Development Seminar",
       topic: "React & Next.js Fundamentals",
-      description: "Learn the basics of modern web development with React and Next.js frameworks",
+      description:
+        "Learn the basics of modern web development with React and Next.js frameworks",
       activityType: "seminar",
       date: "2026-03-15",
       month: "Mar-2026",
@@ -105,7 +106,8 @@ const EnhancedStudentDashboard = () => {
       _id: "a2",
       title: "Advanced Excel Workshop",
       topic: "Data Analysis & Visualization",
-      description: "Master Excel for business analytics and data-driven decision making",
+      description:
+        "Master Excel for business analytics and data-driven decision making",
       activityType: "workshop",
       date: "2026-03-18",
       month: "Mar-2026",
@@ -215,7 +217,9 @@ const EnhancedStudentDashboard = () => {
 
   // Calculate statistics
   const totalStudents = studentsData.length;
-  const activeStudents = studentsData.filter((s) => s.status === "active").length;
+  const activeStudents = studentsData.filter(
+    (s) => s.status === "active",
+  ).length;
   const totalRevenue = studentsData
     .filter((s) => s.status === "active")
     .reduce((sum, s) => sum + s.monthlyFee, 0);
@@ -278,7 +282,20 @@ const EnhancedStudentDashboard = () => {
   };
 
   const getMonthYear = (month, year) => {
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
     return `${months[month - 1]} ${year}`;
   };
 
@@ -303,14 +320,35 @@ const EnhancedStudentDashboard = () => {
               Dashboard
             </p>
           </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-2">
-            Overview & Management
-          </h1>
-          <p className="text-gray-600 text-sm sm:text-base">
-            Manage students, activities, and track fee payments
-          </p>
-        </div>
 
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-2">
+                Overview & Management
+              </h1>
+              <p className="text-gray-600 text-sm sm:text-base">
+                Manage students, activities, and track fee payments
+              </p>
+            </div>
+
+            {/* Transfer Requests button */}
+            <button
+              onClick={() => router.push("/dashboard/request")}
+              className="relative shrink-0 inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all shadow-md shadow-indigo-200 whitespace-nowrap"
+            >
+              <ArrowRightLeft className="w-4 h-4" />
+              <span className="hidden sm:inline">Transfer Requests</span>
+              <span className="sm:hidden">Requests</span>
+
+              {/* ✅ notification dot — show if there are pending requests */}
+              {/* {pendingRequestsCount > 0 && ( */}
+              <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                {/* {pendingRequestsCount > 9 ? "9+" : pendingRequestsCount} */}
+              </span>
+              {/* )} */}
+            </button>
+          </div>
+        </div>
         {/* Statistics Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6 mb-8 lg:mb-12">
           {[
@@ -362,7 +400,9 @@ const EnhancedStudentDashboard = () => {
                 <div className={`h-1 bg-gradient-to-r ${stat.color}`}></div>
                 <div className="p-5 sm:p-6">
                   <div className="flex items-center justify-between mb-3">
-                    <div className={`w-10 h-10 rounded-lg ${stat.bgColor} flex items-center justify-center`}>
+                    <div
+                      className={`w-10 h-10 rounded-lg ${stat.bgColor} flex items-center justify-center`}
+                    >
                       <Icon className="w-5 h-5 text-gray-900" />
                     </div>
                   </div>
@@ -379,11 +419,12 @@ const EnhancedStudentDashboard = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex gap-2 sm:gap-4 mb-8 overflow-x-auto pb-2">
+        {/* <div className="flex gap-2 sm:gap-4 mb-8 overflow-x-auto pb-2">
           {[
             { id: "students", label: "Students", icon: Users },
             { id: "activities", label: "Activities", icon: Zap },
             { id: "fees", label: "Fees", icon: IndianRupee },
+            { id: "Request", label: "Request", icon: PlusCircleIcon  },
           ].map((tab) => {
             const Icon = tab.icon;
             return (
@@ -401,7 +442,7 @@ const EnhancedStudentDashboard = () => {
               </button>
             );
           })}
-        </div>
+        </div> */}
 
         {/* Students Tab */}
         {activeTab === "students" && (
@@ -451,11 +492,13 @@ const EnhancedStudentDashboard = () => {
                         <h3 className="text-lg sm:text-xl font-bold text-gray-900 break-words">
                           {student.name}
                         </h3>
-                        <p className="text-gray-600 text-sm">Roll No. {student.rollno}</p>
+                        <p className="text-gray-600 text-sm">
+                          Roll No. {student.rollno}
+                        </p>
                       </div>
                       <span
                         className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border whitespace-nowrap ml-2 flex-shrink-0 ${getStatusColor(
-                          student.status
+                          student.status,
                         )}`}
                       >
                         {student.status === "active" ? (
@@ -466,8 +509,15 @@ const EnhancedStudentDashboard = () => {
                       </span>
                     </div>
                     <div className="space-y-2 text-sm text-gray-600">
-                      <p><span className="font-semibold text-gray-900">{student.course}</span> • {student.courseDuration}</p>
-                      <p>📅 {student.batch} ({student.days})</p>
+                      <p>
+                        <span className="font-semibold text-gray-900">
+                          {student.course}
+                        </span>{" "}
+                        • {student.courseDuration}
+                      </p>
+                      <p>
+                        📅 {student.batch} ({student.days})
+                      </p>
                       <p>💰 ₹{student.monthlyFee.toLocaleString()}/month</p>
                     </div>
                   </div>
@@ -489,10 +539,14 @@ const EnhancedStudentDashboard = () => {
                     animation: `slideUp 0.6s ease-out ${idx * 0.08}s both`,
                   }}
                 >
-                  <div className={`h-1 bg-gradient-to-r ${getActivityTypeColor(activity.activityType)}`}></div>
+                  <div
+                    className={`h-1 bg-gradient-to-r ${getActivityTypeColor(activity.activityType)}`}
+                  ></div>
                   <div className="p-6 sm:p-7">
                     <div className="flex items-start justify-between mb-4">
-                      <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${getActivityTypeColor(activity.activityType)} flex items-center justify-center text-white`}>
+                      <div
+                        className={`w-12 h-12 rounded-lg bg-gradient-to-br ${getActivityTypeColor(activity.activityType)} flex items-center justify-center text-white`}
+                      >
                         {getActivityIcon(activity.activityType)}
                       </div>
                       <span className="text-xs font-semibold text-gray-600 bg-gray-100 px-2.5 py-1 rounded-full">
@@ -505,7 +559,9 @@ const EnhancedStudentDashboard = () => {
                     <p className="text-sm font-semibold text-blue-600 mb-2">
                       {getActivityTypeLabel(activity.activityType)}
                     </p>
-                    <p className="text-gray-600 text-sm mb-4">{activity.topic}</p>
+                    <p className="text-gray-600 text-sm mb-4">
+                      {activity.topic}
+                    </p>
                     {activity.description && (
                       <p className="text-gray-600 text-sm mb-4 line-clamp-2">
                         {activity.description}
@@ -516,7 +572,9 @@ const EnhancedStudentDashboard = () => {
                         <Calendar className="w-4 h-4" />
                         {formatDate(activity.date)}
                       </div>
-                      <div className="text-sm text-gray-600">{activity.month}</div>
+                      <div className="text-sm text-gray-600">
+                        {activity.month}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -531,16 +589,32 @@ const EnhancedStudentDashboard = () => {
             {/* Fees Summary */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-lg p-6">
-                <p className="text-gray-600 text-sm font-medium mb-2">Total Fees</p>
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900">₹{totalFeeAmount.toLocaleString()}</p>
+                <p className="text-gray-600 text-sm font-medium mb-2">
+                  Total Fees
+                </p>
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900">
+                  ₹{totalFeeAmount.toLocaleString()}
+                </p>
               </div>
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-emerald-200 shadow-lg p-6">
-                <p className="text-emerald-600 text-sm font-medium mb-2">Paid Fees</p>
-                <p className="text-2xl sm:text-3xl font-bold text-emerald-700">{paidFees}/{feesData.length}</p>
+                <p className="text-emerald-600 text-sm font-medium mb-2">
+                  Paid Fees
+                </p>
+                <p className="text-2xl sm:text-3xl font-bold text-emerald-700">
+                  {paidFees}/{feesData.length}
+                </p>
               </div>
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-red-200 shadow-lg p-6">
-                <p className="text-red-600 text-sm font-medium mb-2">Pending Fees</p>
-                <p className="text-2xl sm:text-3xl font-bold text-red-700">₹{feesData.filter(f => !f.paid).reduce((sum, f) => sum + f.amount, 0).toLocaleString()}</p>
+                <p className="text-red-600 text-sm font-medium mb-2">
+                  Pending Fees
+                </p>
+                <p className="text-2xl sm:text-3xl font-bold text-red-700">
+                  ₹
+                  {feesData
+                    .filter((f) => !f.paid)
+                    .reduce((sum, f) => sum + f.amount, 0)
+                    .toLocaleString()}
+                </p>
               </div>
             </div>
 
@@ -550,19 +624,38 @@ const EnhancedStudentDashboard = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="bg-gray-50 border-b border-gray-200">
-                      <th className="px-4 sm:px-6 py-4 text-left text-sm font-semibold text-gray-900">Student</th>
-                      <th className="px-4 sm:px-6 py-4 text-left text-sm font-semibold text-gray-900 hidden sm:table-cell">Month/Year</th>
-                      <th className="px-4 sm:px-6 py-4 text-left text-sm font-semibold text-gray-900">Amount</th>
-                      <th className="px-4 sm:px-6 py-4 text-left text-sm font-semibold text-gray-900">Status</th>
-                      <th className="px-4 sm:px-6 py-4 text-left text-sm font-semibold text-gray-900 hidden lg:table-cell">Date</th>
+                      <th className="px-4 sm:px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        Student
+                      </th>
+                      <th className="px-4 sm:px-6 py-4 text-left text-sm font-semibold text-gray-900 hidden sm:table-cell">
+                        Month/Year
+                      </th>
+                      <th className="px-4 sm:px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        Amount
+                      </th>
+                      <th className="px-4 sm:px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        Status
+                      </th>
+                      <th className="px-4 sm:px-6 py-4 text-left text-sm font-semibold text-gray-900 hidden lg:table-cell">
+                        Date
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {feesData.map((fee) => (
-                      <tr key={fee._id} className="border-b border-gray-100 hover:bg-blue-50 transition-colors">
-                        <td className="px-4 sm:px-6 py-4 text-sm font-medium text-gray-900">{fee.studentName}</td>
-                        <td className="px-4 sm:px-6 py-4 text-sm text-gray-600 hidden sm:table-cell">{getMonthYear(fee.month, fee.year)}</td>
-                        <td className="px-4 sm:px-6 py-4 text-sm font-semibold text-gray-900">₹{fee.amount.toLocaleString()}</td>
+                      <tr
+                        key={fee._id}
+                        className="border-b border-gray-100 hover:bg-blue-50 transition-colors"
+                      >
+                        <td className="px-4 sm:px-6 py-4 text-sm font-medium text-gray-900">
+                          {fee.studentName}
+                        </td>
+                        <td className="px-4 sm:px-6 py-4 text-sm text-gray-600 hidden sm:table-cell">
+                          {getMonthYear(fee.month, fee.year)}
+                        </td>
+                        <td className="px-4 sm:px-6 py-4 text-sm font-semibold text-gray-900">
+                          ₹{fee.amount.toLocaleString()}
+                        </td>
                         <td className="px-4 sm:px-6 py-4">
                           <span
                             className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${
@@ -571,12 +664,18 @@ const EnhancedStudentDashboard = () => {
                                 : "bg-red-100 text-red-700 border-red-200"
                             }`}
                           >
-                            {fee.paid ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
+                            {fee.paid ? (
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                            ) : (
+                              <AlertCircle className="w-3.5 h-3.5" />
+                            )}
                             {fee.paid ? "Paid" : "Pending"}
                           </span>
                         </td>
                         <td className="px-4 sm:px-6 py-4 text-sm text-gray-600 hidden lg:table-cell">
-                          {fee.paid && fee.paidAt ? formatDate(fee.paidAt) : formatDate(fee.dueDate)}
+                          {fee.paid && fee.paidAt
+                            ? formatDate(fee.paidAt)
+                            : formatDate(fee.dueDate)}
                         </td>
                       </tr>
                     ))}

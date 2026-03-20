@@ -22,12 +22,15 @@ import {
   Loader,
   Menu,
   ArrowRight,
+  ArrowRightLeft,
 } from "lucide-react";
 import { useFaculty } from "@/context/facultyContext";
+import { useRouter } from "next/navigation";
 
 const FeeManagement = () => {
   const { getToken } = useAuth();
-  const {BackendURL} = useFaculty();
+  const { BackendURL } = useFaculty();
+  const router = useRouter();
 
   const [fees, setFees] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -279,6 +282,9 @@ const FeeManagement = () => {
     if (status === "not_paid_on_time") {
       return "bg-red-100 text-red-700 border-red-200";
     }
+    if (status === "transfer_request_sent") {
+      return "bg-orange-100 text-orange-700 border-orange-200";
+    }
 
     return "bg-amber-100 text-amber-700 border-amber-200";
   };
@@ -287,6 +293,7 @@ const FeeManagement = () => {
     if (status === "paid_on_time") return "Paid On Time";
     if (status === "paid_late") return "Paid Late";
     if (status === "not_paid_on_time") return "Not Paid On Time";
+    if (status === "transfer_request_sent") return "Transfer Sended";
     return "Unpaid";
   };
 
@@ -301,6 +308,9 @@ const FeeManagement = () => {
 
     if (status === "not_paid_on_time") {
       return <AlertCircle className="w-4 h-4" />;
+    }
+    if (status === "transfer_request_sent") {
+      return <CheckCircle2 className="w-4 h-4" />;
     }
 
     return <Clock className="w-4 h-4" />;
@@ -318,7 +328,7 @@ const FeeManagement = () => {
     ) > 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 p-2 sm:p-4 lg:p-8">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50 p-2 sm:p-4 lg:p-8">
       {/* Background decoration */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-0 right-0 w-48 sm:w-72 md:w-96 h-48 sm:h-72 md:h-96 bg-blue-100/30 rounded-full blur-3xl opacity-20 animate-pulse"></div>
@@ -706,6 +716,7 @@ const FeeManagement = () => {
                     <td className="p-2 md:p-4">
                       {fee.status === "unpaid" ||
                       fee.status === "not_paid_on_time" ? (
+                        // State 1: Unpaid — Mark Paid button
                         <button
                           onClick={() => {
                             setPaymentModal(fee);
@@ -717,9 +728,48 @@ const FeeManagement = () => {
                           <span className="hidden lg:inline">Mark Paid</span>
                           <span className="lg:hidden">Pay</span>
                         </button>
+                      ) : fee.transferStatus === "pending" ? (
+                        // State 2: Transfer pending — not clickable
+                        <span className="inline-flex items-center gap-1 px-2 md:px-3 py-1 md:py-1.5 bg-amber-100 text-amber-700 border border-amber-200 rounded-lg text-[10px] md:text-xs font-semibold whitespace-nowrap cursor-default">
+                          <Clock className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                          <span className="hidden lg:inline">
+                            Transfer Pending
+                          </span>
+                          <span className="lg:hidden">Pending</span>
+                        </span>
+                      ) : fee.transferStatus === "approved" ? (
+                        // State 3: Transfer approved
+                        <span className="inline-flex items-center gap-1 px-2 md:px-3 py-1 md:py-1.5 bg-green-100 text-green-700 border border-green-200 rounded-lg text-[10px] md:text-xs font-semibold whitespace-nowrap cursor-default">
+                          <CheckCircle2 className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                          <span className="hidden lg:inline">
+                            Transfer Approved
+                          </span>
+                          <span className="lg:hidden">Approved</span>
+                        </span>
+                      ) : fee.transferStatus === "declined" ? (
+                        // State 4: Transfer declined — allow retry
+                        <span
+                          onClick={() =>
+                            router.push(`/dashboard/fees/${fee._id}`)
+                          }
+                          className="inline-flex items-center gap-1 px-2 md:px-3 py-1 md:py-1.5 bg-red-100 text-red-700 border border-red-200 rounded-lg hover:bg-red-200 cursor-pointer transition-colors text-[10px] md:text-xs font-semibold whitespace-nowrap"
+                        >
+                          <ArrowRightLeft className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                          <span className="hidden lg:inline">
+                            Retry Transfer
+                          </span>
+                          <span className="lg:hidden">Retry</span>
+                        </span>
                       ) : (
-                        <span className="text-[10px] md:text-xs text-gray-500 font-medium">
-                          ✓ Done
+                        // State 5: Paid, no transfer — Transfer button
+                        <span
+                          onClick={() =>
+                            router.push(`/dashboard/fees/${fee._id}`)
+                          }
+                          className="inline-flex items-center gap-1 px-2 md:px-3 py-1 md:py-1.5 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 cursor-pointer transition-colors text-[10px] md:text-xs font-semibold whitespace-nowrap"
+                        >
+                          <ArrowRightLeft className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                          Transfer
                         </span>
                       )}
                     </td>
