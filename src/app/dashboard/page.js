@@ -300,7 +300,7 @@ const EnhancedStudentDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 py-6 sm:py-8 lg:py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50 py-6 sm:py-8 lg:py-12 px-4 sm:px-6 lg:px-8">
       {/* Background decoration */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-100/30 rounded-full blur-3xl opacity-20 animate-pulse"></div>
@@ -315,7 +315,7 @@ const EnhancedStudentDashboard = () => {
         {/* Header */}
         <div className="mb-8 sm:mb-12">
           <div className="flex items-center gap-2 mb-4">
-            <div className="h-1 w-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full"></div>
+            <div className="h-1 w-8 bg-linear-to-r from-blue-600 to-indigo-600 rounded-full"></div>
             <p className="text-xs sm:text-sm font-semibold text-blue-600 uppercase tracking-widest">
               Dashboard
             </p>
@@ -397,7 +397,7 @@ const EnhancedStudentDashboard = () => {
                   animation: `slideIn 0.6s ease-out ${idx * 0.1}s both`,
                 }}
               >
-                <div className={`h-1 bg-gradient-to-r ${stat.color}`}></div>
+                <div className={`h-1 bg-linear-to-r ${stat.color}`}></div>
                 <div className="p-5 sm:p-6">
                   <div className="flex items-center justify-between mb-3">
                     <div
@@ -433,7 +433,7 @@ const EnhancedStudentDashboard = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold text-sm sm:text-base whitespace-nowrap transition-all duration-300 ${
                   activeTab === tab.id
-                    ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg"
+                    ? "bg-linear-to-r from-blue-500 to-indigo-600 text-white shadow-lg"
                     : "bg-white/80 border border-gray-200 text-gray-900 hover:border-blue-300"
                 }`}
               >
@@ -485,11 +485,11 @@ const EnhancedStudentDashboard = () => {
                     animation: `slideUp 0.6s ease-out ${idx * 0.08}s both`,
                   }}
                 >
-                  <div className="h-1 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
+                  <div className="h-1 bg-linear-to-r from-blue-500 to-indigo-500"></div>
                   <div className="p-6 sm:p-7">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 break-words">
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 wrap-break-word">
                           {student.name}
                         </h3>
                         <p className="text-gray-600 text-sm">
@@ -497,7 +497,7 @@ const EnhancedStudentDashboard = () => {
                         </p>
                       </div>
                       <span
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border whitespace-nowrap ml-2 flex-shrink-0 ${getStatusColor(
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border whitespace-nowrap ml-2 shrink-0 ${getStatusColor(
                           student.status,
                         )}`}
                       >
@@ -540,12 +540,12 @@ const EnhancedStudentDashboard = () => {
                   }}
                 >
                   <div
-                    className={`h-1 bg-gradient-to-r ${getActivityTypeColor(activity.activityType)}`}
+                    className={`h-1 bg-linear-to-r ${getActivityTypeColor(activity.activityType)}`}
                   ></div>
                   <div className="p-6 sm:p-7">
                     <div className="flex items-start justify-between mb-4">
                       <div
-                        className={`w-12 h-12 rounded-lg bg-gradient-to-br ${getActivityTypeColor(activity.activityType)} flex items-center justify-center text-white`}
+                        className={`w-12 h-12 rounded-lg bg-linear-to-br ${getActivityTypeColor(activity.activityType)} flex items-center justify-center text-white`}
                       >
                         {getActivityIcon(activity.activityType)}
                       </div>
@@ -553,7 +553,7 @@ const EnhancedStudentDashboard = () => {
                         {activity.scoreWeight} pts
                       </span>
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-1 break-words">
+                    <h3 className="text-lg font-bold text-gray-900 mb-1 wrap-break-word">
                       {activity.title}
                     </h3>
                     <p className="text-sm font-semibold text-blue-600 mb-2">
