@@ -606,7 +606,7 @@ const FeeManagement = () => {
                   </div>
                 </div>
 
-                {/* Action Button */}
+                {/* Action Button — Mobile */}
                 {fee.status === "unpaid" ||
                 fee.status === "not_paid_on_time" ? (
                   <button
@@ -619,10 +619,32 @@ const FeeManagement = () => {
                     <Check className="w-3.5 h-3.5" />
                     Mark Paid
                   </button>
-                ) : (
-                  <div className="text-center text-[10px] sm:text-xs text-gray-500 font-medium">
-                    ✓ Completed
+                ) : fee.transferStatus === "pending" ? (
+                  <div className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-amber-100 text-amber-700 border border-amber-200 rounded-lg text-xs sm:text-sm font-semibold cursor-default">
+                    <Clock className="w-3.5 h-3.5" />
+                    Transfer Pending
                   </div>
+                ) : fee.transferStatus === "approved" ? (
+                  <div className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-green-100 text-green-700 border border-green-200 rounded-lg text-xs sm:text-sm font-semibold cursor-default">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    Transfer Approved
+                  </div>
+                ) : fee.transferStatus === "declined" ? (
+                  <button
+                    onClick={() => router.push(`/dashboard/fees/${fee._id}`)}
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-red-100 text-red-700 border border-red-200 rounded-lg hover:bg-red-200 transition-colors text-xs sm:text-sm font-semibold"
+                  >
+                    <ArrowRightLeft className="w-3.5 h-3.5" />
+                    Retry Transfer
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => router.push(`/dashboard/fees/${fee._id}`)}
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-xs sm:text-sm font-semibold"
+                  >
+                    <ArrowRightLeft className="w-3.5 h-3.5" />
+                    Transfer
+                  </button>
                 )}
               </div>
             ))
