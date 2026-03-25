@@ -211,7 +211,7 @@ const FeeManagement = () => {
             fee._id === paymentModal._id
               ? {
                   ...fee,
-                  status: data.data.status, // ✅ use backend status
+                  status: data.fee.status, // ✅ use backend status
                   paidAt: new Date(),
                 }
               : fee,

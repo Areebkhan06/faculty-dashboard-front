@@ -16,6 +16,9 @@ import {
   Eye,
   Edit,
   Trash2,
+  Check,
+  Loader, // ✅ add
+  CheckCircle2, // ✅ add
 } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
 import { useFaculty } from "@/context/facultyContext";
@@ -30,6 +33,7 @@ export default function StudentsDashboard() {
   const router = useRouter();
   const { isSignedIn, getToken } = useAuth();
 
+  // ── useState ────────────────────────────────────
   const [searchTerm, setSearchTerm] = useState("");
   const [courseFilter, setCourseFilter] = useState("");
   const [batchFilter, setBatchFilter] = useState("");
@@ -37,33 +41,9 @@ export default function StudentsDashboard() {
   const [openMenu, setOpenMenu] = useState(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
+  const [completing, setCompleting] = useState(null);
 
-  useEffect(() => {
-    const loadStudents = async () => {
-      if (isSignedIn) {
-        setLoading(true);
-        await fetchAllStudents();
-        setLoading(false);
-      }
-    };
-
-    loadStudents();
-  }, [isSignedIn]);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-[70vh]">
-        <div className="flex flex-col items-center gap-3">
-          <Loading />
-        </div>
-      </div>
-    );
-  }
-
-  /* ------------------------------
-   Optimized Search
---------------------------------*/
-
+  // ── useMemo ─────────────────────────────────────
   const normalizedStudents = useMemo(() => {
     return students.map((s) => ({
       ...s,
@@ -75,7 +55,6 @@ export default function StudentsDashboard() {
 
   const filteredStudents = useMemo(() => {
     const search = searchTerm.trim().toLowerCase();
-
     return normalizedStudents.filter((s) => {
       if (
         search &&
@@ -84,33 +63,20 @@ export default function StudentsDashboard() {
           s.rollnoStr.includes(search) ||
           s.courseLower.includes(search)
         )
-      ) {
+      )
         return false;
-      }
-
-      if (courseFilter && s.courseLower !== courseFilter.toLowerCase()) {
+      if (courseFilter && s.courseLower !== courseFilter.toLowerCase())
         return false;
-      }
-
-      if (batchFilter && s.batch !== batchFilter) {
-        return false;
-      }
-
-      if (daysFilter && s.days !== daysFilter) {
-        return false;
-      }
-
+      if (batchFilter && s.batch !== batchFilter) return false;
+      if (daysFilter && s.days !== daysFilter) return false;
       return true;
     });
   }, [normalizedStudents, searchTerm, courseFilter, batchFilter, daysFilter]);
-  /* ------------------------------
-   Optimized Stats (Single Loop)
---------------------------------*/
-  const { activeCount, dropoutCount, totalRevenue } = useMemo(() => {
-    let active = 0;
-    let dropout = 0;
-    let revenue = 0;
 
+  const { activeCount, dropoutCount, totalRevenue } = useMemo(() => {
+    let active = 0,
+      dropout = 0,
+      revenue = 0;
     for (let s of students) {
       if (s.status === "active") {
         active++;
@@ -119,7 +85,6 @@ export default function StudentsDashboard() {
         dropout++;
       }
     }
-
     return {
       activeCount: active,
       dropoutCount: dropout,
@@ -127,9 +92,6 @@ export default function StudentsDashboard() {
     };
   }, [students]);
 
-  /* ------------------------------
-   Currency Format (memoized)
---------------------------------*/
   const formattedRevenue = useMemo(() => {
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
@@ -138,14 +100,46 @@ export default function StudentsDashboard() {
     }).format(totalRevenue);
   }, [totalRevenue]);
 
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-  };
+  // ── useEffect ────────────────────────────────────
+  useEffect(() => {
+    const loadStudents = async () => {
+      if (isSignedIn) {
+        setLoading(true);
+        await fetchAllStudents();
+        setLoading(false);
+      }
+    };
+    loadStudents();
+  }, [isSignedIn]);
+
+  useEffect(() => {
+    // ✅ moved up before early return
+    const handleClickOutside = (e) => {
+      if (!e.target.closest(".menu-container")) {
+        setOpenMenu(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // ── Early return AFTER all hooks ─────────────────
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[70vh]">
+        <div className="flex flex-col items-center gap-3">
+          <Loading />
+        </div>
+      </div>
+    );
+  }
+
+  // ── Regular functions ────────────────────────────
+  const handleSearch = (e) => setSearchTerm(e.target.value);
 
   const handleDeleteStudent = async (id) => {
     try {
       const token = await getToken({ template: "default" });
-
       const res = await fetch(`${BackendURL}/api/delete-student`, {
         method: "POST",
         headers: {
@@ -154,31 +148,18 @@ export default function StudentsDashboard() {
         },
         body: JSON.stringify({ id }),
       });
-
       const data = await res.json();
-
-      if (data.success) {
-        fetchAllStudents(); // refresh list
-      } else {
-        console.log(data.message);
-      }
+      if (data.success) fetchAllStudents();
     } catch (error) {
       console.log(error);
     }
   };
 
   const handleDeleteAllStudents = async () => {
-    const confirmDelete = confirm(
-      "Are you sure you want to delete ALL students?",
-    );
-
-    if (!confirmDelete) return;
-
-    setDeleting(true)
-
+    if (!confirm("Are you sure you want to delete ALL students?")) return;
+    setDeleting(true);
     try {
       const token = await getToken({ template: "default" });
-
       const res = await fetch(`${BackendURL}/api/delete-all-students`, {
         method: "POST",
         headers: {
@@ -186,19 +167,38 @@ export default function StudentsDashboard() {
           Authorization: `Bearer ${token}`,
         },
       });
-
       const data = await res.json();
-
       if (data.success) {
         alert("Deleted all students");
         fetchAllStudents();
-        setDeleting(false)
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setDeleting(false);
     }
   };
 
+  const markComplete = async (id) => {
+    setCompleting(id);
+    try {
+      const token = await getToken({ template: "default" });
+      const res = await fetch(`${BackendURL}/api/marke-complete`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ studentId: id }),
+      });
+      const data = await res.json();
+      if (data.success) fetchAllStudents();
+    } catch (err) {
+      console.error("markComplete error →", err);
+    } finally {
+      setCompleting(null);
+    }
+  };
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50">
       {/* Decorative background elements */}
@@ -233,7 +233,7 @@ export default function StudentsDashboard() {
                     ? "bg-red-300 cursor-not-allowed"
                     : "bg-red-600 hover:bg-red-700 text-white border border-red-500"
                 }`}
-                          >
+              >
                 {deleting ? (
                   "Deleting..."
                 ) : (
@@ -416,7 +416,7 @@ export default function StudentsDashboard() {
                         </td>
 
                         <td className="px-6 py-4 text-center">
-                          <div className="relative inline-block">
+                          <div className="relative inline-block menu-container">
                             <button
                               onClick={() =>
                                 setOpenMenu(openMenu === s._id ? null : s._id)
@@ -428,14 +428,37 @@ export default function StudentsDashboard() {
 
                             {openMenu === s._id && (
                               <div className="absolute right-0 mt-1 w-40 bg-white border border-slate-200 rounded-lg shadow-lg z-50 py-1">
-                                <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 transition">
-                                  <Eye size={16} /> View Details
-                                </button>
+                                {/* ✅ Hide Mark Complete if already completed */}
+                                {s.status !== "completed" && (
+                                  <button
+                                    onClick={() => {
+                                      markComplete(s._id);
+                                      setOpenMenu(null);
+                                    }}
+                                    disabled={completing === s._id}
+                                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-emerald-600 hover:bg-emerald-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    {completing === s._id ? (
+                                      <Loader
+                                        size={16}
+                                        className="animate-spin"
+                                      />
+                                    ) : (
+                                      <CheckCircle2 size={16} />
+                                    )}
+                                    Mark Complete
+                                  </button>
+                                )}
+
                                 <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 transition">
                                   <Edit size={16} /> Edit
                                 </button>
+
                                 <button
-                                  onClick={() => handleDeleteStudent(s._id)}
+                                  onClick={() => {
+                                    handleDeleteStudent(s._id);
+                                    setOpenMenu(null);
+                                  }}
                                   className="w-full flex items-center gap-2 px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 transition"
                                 >
                                   <Trash2 size={16} /> Delete
