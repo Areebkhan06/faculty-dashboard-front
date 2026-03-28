@@ -63,8 +63,11 @@ const FeeManagement = () => {
   // Initialize current month/year and generate history
   useEffect(() => {
     const now = new Date();
-    const month = now.getMonth() + 1;
-    const year = now.getFullYear();
+
+    const nextMonthDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
+    const month = nextMonthDate.getMonth() + 1;
+    const year = nextMonthDate.getFullYear();
 
     setCurrentMonth(month);
     setCurrentYear(year);
@@ -108,10 +111,10 @@ const FeeManagement = () => {
   };
 
   const handleMonthChange = (month, year) => {
-  setCurrentMonth(month);
-  setCurrentYear(year);
-  fetchFees(month, year);
-};
+    setCurrentMonth(month);
+    setCurrentYear(year);
+    fetchFees(month, year);
+  };
 
   const handlePreviousMonth = () => {
     let prevMonth = currentMonth - 1;
@@ -275,10 +278,12 @@ const FeeManagement = () => {
     ) <
     availableMonths.length - 1;
 
-  const canGoNext =
+  const isNextAllowed = today >= 25;
+
+  const canGoNextFinal =
     availableMonths.findIndex(
       (m) => m.month === currentMonth && m.year === currentYear,
-    ) > 0;
+    ) > 0 && isNextAllowed;
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50 p-2 sm:p-4 lg:p-8">
@@ -374,9 +379,9 @@ const FeeManagement = () => {
 
                 <button
                   onClick={handleNextMonth}
-                  disabled={!canGoNext}
+                  disabled={!canGoNextFinal}
                   className={`flex items-center gap-1 px-2.5 md:px-3 py-1.5 md:py-2 rounded-lg transition-colors font-semibold text-xs md:text-sm whitespace-nowrap ${
-                    canGoNext
+                    canGoNextFinal
                       ? "bg-green-100 text-green-700 hover:bg-green-200"
                       : "bg-gray-100 text-gray-400 cursor-not-allowed"
                   }`}
