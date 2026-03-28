@@ -45,21 +45,6 @@ const FeeManagement = () => {
   const [availableMonths, setAvailableMonths] = useState([]);
   const [showMonthDropdown, setShowMonthDropdown] = useState(false);
 
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
   const monthsShort = [
     "Jan",
     "Feb",
@@ -83,21 +68,6 @@ const FeeManagement = () => {
 
     setCurrentMonth(month);
     setCurrentYear(year);
-
-    // Generate last 12 months history
-    const history = [];
-    for (let i = 0; i < 12; i++) {
-      let m = month - i;
-      let y = year;
-      while (m <= 0) {
-        m += 12;
-        y -= 1;
-      }
-      history.push({ month: m, year: y });
-    }
-    setMonthHistory(history);
-
-    // Fetch fees for current month
     fetchFees(month, year);
   }, []);
 
@@ -122,32 +92,13 @@ const FeeManagement = () => {
       if (data.success) {
         setFees(data.allfees || []);
 
-        const months = new Map();
+        // ✅ use backend months (better)
+        const months = (data.availableMonths || []).map((m) => ({
+          month: m,
+          year: year,
+        }));
 
-        data.allfees.forEach((fee) => {
-          const key = `${fee.month}-${fee.year}`;
-
-          if (!months.has(key)) {
-            months.set(key, {
-              month: fee.month,
-              year: fee.year,
-            });
-          }
-        });
-
-        const sortedMonths = Array.from(months.values()).sort((a, b) => {
-          if (b.year !== a.year) return b.year - a.year;
-          return b.month - a.month;
-        });
-
-        setAvailableMonths(sortedMonths);
-
-        if (sortedMonths.length > 0) {
-          const firstMonth = sortedMonths[0];
-
-          setCurrentMonth(firstMonth.month);
-          setCurrentYear(firstMonth.year);
-        }
+        setAvailableMonths(months);
       }
     } catch (error) {
       console.error(error);
@@ -157,8 +108,10 @@ const FeeManagement = () => {
   };
 
   const handleMonthChange = (month, year) => {
-    fetchFees(month, year);
-  };
+  setCurrentMonth(month);
+  setCurrentYear(year);
+  fetchFees(month, year);
+};
 
   const handlePreviousMonth = () => {
     let prevMonth = currentMonth - 1;
@@ -341,8 +294,8 @@ const FeeManagement = () => {
       <div className="relative z-10 max-w-7xl mx-auto space-y-3 sm:space-y-4 md:space-y-6 lg:space-y-8">
         {/* PAGE TITLE */}
         <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">
-            Fee Management
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">
+            Fee <span className="text-indigo-600">Management</span>
           </h1>
           <p className="text-xs sm:text-sm text-gray-600 mt-0.5 sm:mt-1">
             Track and manage student fee payments

@@ -212,9 +212,9 @@ export default function StudentsDashboard() {
           {/* ===== HEADER ===== */}
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
             <div className="space-y-2">
-              <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">
-                Student Directory
-              </h1>
+              <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">
+              Student <span className="text-indigo-600">Directory</span>
+            </h1>
               <p className="text-slate-600 text-sm sm:text-base">
                 Manage students, monitor status and track revenue
               </p>
@@ -523,11 +523,28 @@ export default function StudentsDashboard() {
                   </div>
 
                   <div className="flex gap-2 pt-2 border-t border-slate-200">
-                    <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs text-slate-700 bg-slate-50 hover:bg-slate-100 rounded transition font-medium">
-                      <Eye size={14} /> View
-                    </button>
-                    <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs text-slate-700 bg-slate-50 hover:bg-slate-100 rounded transition font-medium">
-                      <Edit size={14} /> Edit
+                    {/* ✅ Mark Complete */}
+                    {s.status !== "completed" && (
+                      <button
+                        onClick={() => markComplete(s._id)}
+                        disabled={completing === s._id}
+                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded transition font-medium disabled:opacity-50"
+                      >
+                        {completing === s._id ? (
+                          <Loader size={14} className="animate-spin" />
+                        ) : (
+                          <CheckCircle2 size={14} />
+                        )}
+                        Complete
+                      </button>
+                    )}
+
+                    {/* Delete */}
+                    <button
+                      onClick={() => handleDeleteStudent(s._id)}
+                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs text-rose-600 bg-rose-50 hover:bg-rose-100 rounded transition font-medium"
+                    >
+                      <Trash2 size={14} /> Delete
                     </button>
                   </div>
                 </div>
@@ -574,12 +591,26 @@ export default function StudentsDashboard() {
                   </div>
 
                   <div className="flex gap-2 pt-2">
-                    {/* <button className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-xs text-slate-700 bg-slate-50 hover:bg-slate-100 rounded transition font-medium">
-                      <Eye size={14} /> View
-                    </button> */}
+                    {/* ✅ Mark Complete */}
+                    {s.status !== "completed" && (
+                      <button
+                        onClick={() => markComplete(s._id)}
+                        disabled={completing === s._id}
+                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-xs text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded transition font-medium disabled:opacity-50"
+                      >
+                        {completing === s._id ? (
+                          <Loader size={14} className="animate-spin" />
+                        ) : (
+                          <CheckCircle2 size={14} />
+                        )}
+                        Done
+                      </button>
+                    )}
+
+                    {/* Delete */}
                     <button
                       onClick={() => handleDeleteStudent(s._id)}
-                      className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-xs text-slate-700 bg-slate-50 hover:bg-slate-100 rounded transition font-medium"
+                      className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-xs text-rose-600 bg-rose-50 hover:bg-rose-100 rounded transition font-medium"
                     >
                       <Trash2 size={14} /> Delete
                     </button>
