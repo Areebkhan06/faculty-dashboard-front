@@ -287,57 +287,74 @@ const FeeManagement = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50 p-2 sm:p-4 lg:p-8">
-      {/* Background decoration */}
+      {/* Background decoration - Simplified for performance */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-0 right-0 w-48 sm:w-72 md:w-96 h-48 sm:h-72 md:h-96 bg-blue-100/30 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+        <div className="absolute top-0 right-0 w-48 sm:w-96 h-48 sm:h-96 bg-blue-100/30 rounded-full blur-3xl opacity-20 animate-pulse"></div>
         <div
-          className="absolute bottom-0 left-0 w-40 sm:w-64 md:w-80 h-40 sm:h-64 md:h-80 bg-indigo-100/30 rounded-full blur-3xl opacity-20 animate-pulse"
+          className="absolute bottom-0 left-0 w-40 sm:w-80 h-40 sm:h-80 bg-indigo-100/30 rounded-full blur-3xl opacity-20 animate-pulse"
           style={{ animationDelay: "1s" }}
         ></div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto space-y-3 sm:space-y-4 md:space-y-6 lg:space-y-8">
+      <div className="relative z-10 max-w-7xl mx-auto space-y-4 md:space-y-6 lg:space-y-8">
         {/* PAGE TITLE */}
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">
+        <div className="px-1">
+          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl md:text-4xl">
             Fee <span className="text-indigo-600">Management</span>
           </h1>
-          <p className="text-xs sm:text-sm text-gray-600 mt-0.5 sm:mt-1">
+          <p className="text-[11px] sm:text-sm text-gray-600 mt-1">
             Track and manage student fee payments
           </p>
         </div>
 
         {/* MONTH NAVIGATION */}
         {availableMonths.length > 0 && (
-          <div className="bg-white/80 backdrop-blur-sm rounded-lg sm:rounded-xl md:rounded-2xl border border-gray-200 shadow-lg p-2.5 sm:p-4 md:p-6">
-            {/* Month Display and Navigation */}
-            <div className="flex flex-col gap-2 sm:gap-3 md:gap-4">
-              {/* Top Row: Label and Current Month */}
-              <div className="flex items-center justify-between">
-                <h2 className="text-xs sm:text-sm font-semibold text-gray-900">
-                  Month
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-gray-200 shadow-sm p-3 sm:p-4 md:p-6">
+            <div className="flex flex-col gap-4">
+              {/* Top Header: Label and Current Selection */}
+              <div className="flex items-center justify-between px-1">
+                <h2 className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest">
+                  Billing Period
                 </h2>
-                <span className="text-base sm:text-lg md:text-2xl font-bold text-blue-600">
+                <span className="text-lg sm:text-xl md:text-2xl font-black text-indigo-600">
                   {monthsShort[currentMonth - 1]} {currentYear}
                 </span>
               </div>
 
-              {/* Mobile: Dropdown Button */}
-              <div className="md:hidden relative z-50">
-                <button
-                  onClick={() => setShowMonthDropdown(!showMonthDropdown)}
-                  className="w-full flex items-center justify-between px-3 py-2 sm:py-2.5 border border-gray-300 rounded-lg bg-white text-gray-900 text-xs sm:text-sm font-medium hover:border-blue-400 transition-colors"
-                >
-                  <span>Select Month</span>
-                  <ChevronDown
-                    className={`w-4 h-4 transition-transform ${
-                      showMonthDropdown ? "rotate-180" : ""
+              {/* Main Interaction Area */}
+              <div className="flex flex-col lg:flex-row lg:items-center gap-4 border-t border-gray-50 pt-4">
+                {/* Navigation Controls (Always Visible) */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={handlePreviousMonth}
+                    disabled={!canGoPrevious}
+                    className={`flex-1 lg:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg transition-all font-bold text-sm ${
+                      canGoPrevious
+                        ? "bg-slate-100 text-slate-700 hover:bg-indigo-50 hover:text-indigo-600"
+                        : "opacity-40 cursor-not-allowed"
                     }`}
-                  />
-                </button>
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    <span className="hidden sm:inline">Prev</span>
+                  </button>
 
-                {showMonthDropdown && (
-                  <div className="absolute top-full mt-1 left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-40 max-h-48 overflow-y-auto">
+                  <button
+                    onClick={handleNextMonth}
+                    disabled={!canGoNextFinal}
+                    className={`flex-1 lg:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg transition-all font-bold text-sm ${
+                      canGoNextFinal
+                        ? "bg-slate-100 text-slate-700 hover:bg-indigo-50 hover:text-indigo-600"
+                        : "opacity-40 cursor-not-allowed"
+                    }`}
+                  >
+                    <span className="hidden sm:inline">Next</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Scrollable Month Pills (Visible on ALL screens) */}
+                <div className="overflow-x-auto no-scrollbar py-1 flex-1">
+                  <div className="flex gap-2 min-w-max">
                     {availableMonths.map((item, idx) => {
                       const isActive =
                         item.month === currentMonth &&
@@ -348,10 +365,10 @@ const FeeManagement = () => {
                           onClick={() =>
                             handleMonthChange(item.month, item.year)
                           }
-                          className={`w-full text-left px-3 py-2 text-xs sm:text-sm font-medium transition-colors ${
+                          className={`px-4 py-2 rounded-full whitespace-nowrap font-bold text-xs transition-all active:scale-95 ${
                             isActive
-                              ? "bg-blue-600 text-white"
-                              : "text-gray-900 hover:bg-gray-50"
+                              ? "bg-indigo-600 text-white shadow-md shadow-indigo-100"
+                              : "bg-white border border-gray-200 text-gray-600 hover:border-indigo-300 hover:bg-gray-50"
                           }`}
                         >
                           {monthsShort[item.month - 1]} {item.year}
@@ -359,58 +376,6 @@ const FeeManagement = () => {
                       );
                     })}
                   </div>
-                )}
-              </div>
-
-              {/* Tablet and Up: Navigation Buttons */}
-              <div className="hidden md:flex items-center gap-2">
-                <button
-                  onClick={handlePreviousMonth}
-                  disabled={!canGoPrevious}
-                  className={`flex items-center gap-1 px-2.5 md:px-3 py-1.5 md:py-2 rounded-lg transition-colors font-semibold text-xs md:text-sm whitespace-nowrap ${
-                    canGoPrevious
-                      ? "bg-blue-100 text-blue-700 hover:bg-blue-200"
-                      : "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  }`}
-                >
-                  <ChevronLeft className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                  Previous
-                </button>
-
-                <button
-                  onClick={handleNextMonth}
-                  disabled={!canGoNextFinal}
-                  className={`flex items-center gap-1 px-2.5 md:px-3 py-1.5 md:py-2 rounded-lg transition-colors font-semibold text-xs md:text-sm whitespace-nowrap ${
-                    canGoNextFinal
-                      ? "bg-green-100 text-green-700 hover:bg-green-200"
-                      : "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  }`}
-                >
-                  Next
-                  <ChevronRight className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                </button>
-              </div>
-
-              {/* Desktop: Month Pills */}
-              <div className="hidden lg:block overflow-x-auto pb-1">
-                <div className="flex gap-2 min-w-max">
-                  {availableMonths.map((item, idx) => {
-                    const isActive =
-                      item.month === currentMonth && item.year === currentYear;
-                    return (
-                      <button
-                        key={idx}
-                        onClick={() => handleMonthChange(item.month, item.year)}
-                        className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg whitespace-nowrap font-semibold text-xs md:text-sm transition-all ${
-                          isActive
-                            ? "bg-blue-600 text-white shadow-lg"
-                            : "bg-white border border-gray-200 text-gray-900 hover:border-blue-300"
-                        }`}
-                      >
-                        {monthsShort[item.month - 1]} {item.year}
-                      </button>
-                    );
-                  })}
                 </div>
               </div>
             </div>
