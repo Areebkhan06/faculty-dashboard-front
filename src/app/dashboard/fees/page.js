@@ -43,7 +43,6 @@ const FeeManagement = () => {
   const [paymentDate, setPaymentDate] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [availableMonths, setAvailableMonths] = useState([]);
-  const [showMonthDropdown, setShowMonthDropdown] = useState(false);
 
   const monthsShort = [
     "Jan",
@@ -64,15 +63,17 @@ const FeeManagement = () => {
   useEffect(() => {
     const now = new Date();
 
-    const nextMonthDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-
-    const month = nextMonthDate.getMonth() + 1;
-    const year = nextMonthDate.getFullYear();
+    const month = now.getMonth() + 1; // ✅ CURRENT month
+    const year = now.getFullYear();    
 
     setCurrentMonth(month);
     setCurrentYear(year);
+
     fetchFees(month, year);
   }, []);
+
+  console.log(currentMonth);
+  
 
   // Fetch fees from API
   const fetchFees = async (month, year) => {
@@ -89,6 +90,8 @@ const FeeManagement = () => {
         },
         body: JSON.stringify({ month, year }),
       });
+
+      console.log("URL:", BackendURL + "/api/get-fees");
 
       const data = await res.json();
 
@@ -117,14 +120,16 @@ const FeeManagement = () => {
   };
 
   const handlePreviousMonth = () => {
-    let prevMonth = currentMonth - 1;
-    let prevYear = currentYear;
-    if (prevMonth <= 0) {
-      prevMonth = 12;
-      prevYear -= 1;
-    }
-    handleMonthChange(prevMonth, prevYear);
-  };
+  let prevMonth = currentMonth - 1;
+  let prevYear = currentYear;
+
+  if (prevMonth <= 0) {
+    prevMonth = 12;
+    prevYear -= 1;
+  }
+
+  handleMonthChange(prevMonth, prevYear);
+};
 
   const handleNextMonth = () => {
     let nextMonth = currentMonth + 1;
