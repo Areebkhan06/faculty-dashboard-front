@@ -792,8 +792,6 @@ const FeeManagement = () => {
               </label>
               <input
                 type="date"
-                min={today}
-                max={today}
                 value={paymentDate}
                 onChange={(e) => setPaymentDate(e.target.value)}
                 className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-xs sm:text-sm md:text-base"
